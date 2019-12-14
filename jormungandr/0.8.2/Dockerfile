@@ -37,8 +37,8 @@ COPY usr/local/bin/docker-entrypoint.sh /usr/local/bin/
 
 RUN mkdir -p /srv/cardano/jormungandr/
 
-RUN useradd -b /srv/cardano/jormungandr/ \
-            -c "Jormungandr node user" \
+RUN useradd -c "Jormungandr node user" \
+            -d /srv/cardano/jormungandr/ \
             -M \
             -r \
             -s /bin/nologin \
