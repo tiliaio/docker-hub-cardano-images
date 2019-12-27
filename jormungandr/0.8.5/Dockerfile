@@ -51,4 +51,6 @@ RUN mkdir /srv/cardano/jormungandr/etc/secrets/
 
 WORKDIR /srv/cardano/jormungandr/
 
+RUN jcli auto-completion bash ~/etc/ && echo '. ~/etc/jcli.bash' >> .bash_profile
+
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
