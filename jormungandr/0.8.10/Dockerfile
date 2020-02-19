@@ -33,6 +33,7 @@ EXPOSE 3000
 
 COPY --from=builder /usr/local/bin/jormungandr /usr/local/bin/
 COPY --from=builder /usr/local/bin/jcli /usr/local/bin/
+COPY usr/local/lib/* /usr/local/lib/
 COPY usr/local/bin/* /usr/local/bin/
 
 RUN mkdir -p /srv/cardano/
