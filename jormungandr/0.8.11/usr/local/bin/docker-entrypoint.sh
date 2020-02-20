@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 set -e
-JORM_USER_HOME=$HOME
-GENESIS_HASH_FILE=${JORM_USER_HOME}etc/genesis-hash.txt
-NODE_CONFIG_FILE=${JORM_USER_HOME}etc/node_config.json
-NODE_SECRET_FILE=${JORM_USER_HOME}etc/secrets/node_secret.yaml
+
+source /usr/local/lib/jcli-set-env-variables.sh
 
 function preExitHook () {
   exec "$@"
@@ -78,22 +76,22 @@ else
   echo "Genesis hash set to ${GENESIS_HASH}!"
 fi
 
-if [[ ! -f ${NODE_CONFIG_FILE} ]]; then
+if [[ ! -f ${JORM_CONF_FILE} ]]; then
   echo 'Jormungandr node config file does not exists! Jormungandr can NOT start!!!'
   preExitHook "$@"
   exit
 else
-  if [[ ! -f ${NODE_SECRET_FILE} ]]; then
+  if [[ ! -f ${JORM_SECRET_FILE} ]]; then
     echo "Jormungandr node secret file not found! Jormungandr will start in a passive mode!"
     jormungandr \
       --genesis-block-hash ${GENESIS_HASH} \
-      --config ${NODE_CONFIG_FILE}
+      --config ${JORM_CONF_FILE}
   else
     echo 'Jormungand node secret file found! Jormungandr will start in a slot leader mode!'
     jormungandr \
       --genesis-block-hash ${GENESIS_HASH} \
-      --config ${NODE_CONFIG_FILE} \
-      --secret ${NODE_SECRET_FILE}
+      --config ${JORM_CONF_FILE} \
+      --secret ${JORM_SECRET_FILE}
   fi
 fi
 
