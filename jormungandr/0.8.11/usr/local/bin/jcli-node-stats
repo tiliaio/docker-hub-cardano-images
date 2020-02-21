@@ -13,8 +13,8 @@ case "$1" in
       if [[ ${JORM_MAX_STARTUP_TIME} -eq 0 ]]; then
         echo -n "Jormungandr startup time healthcheck disabled."
       elif [[ ${UPTIME} -gt $((${JORM_MAX_STARTUP_TIME} * 60)) ]]; then
-        # Terminate if not ready in ${JORM_MAX_STARTUP_MIN} minutes
-        echo -n "Jormungandr was bootstrapping for ${JORM_MAX_STARTUP_MIN} minutes!"
+        # Terminate if not ready in ${JORM_MAX_STARTUP_TIME} minutes
+        echo -n "Jormungandr was bootstrapping for ${JORM_MAX_STARTUP_TIME} minutes!"
         exit 1
       else
         UPTIME=$(( ${UPTIME} / 60 ))
@@ -33,14 +33,20 @@ case "$1" in
           if [[ $((${CURRENT_TIME} % 5)) -eq 0 ]]; then
             source /usr/local/lib/jormungandr-pooltool-reporter.sh
             if [[ ${lastBlockHeight} == ${POOLTOOL_MAXHEIGHT} ]]; then
-              echo -n "PoolTool reporting same block height: ${lastBlockHeight}"
+              echo -n "PoolTool is reporting same lastBlockHeight: ${lastBlockHeight}"
               exit 0
             elif [[ ${lastBlockHeight} -lt ${POOLTOOL_MAXHEIGHT} ]]; then
               DELTA=$((${POOLTOOL_MAXHEIGHT} - ${lastBlockHeight}))
-              echo -n "PoolTool reporting block height of ${POOLTOOL_MAXHEIGHT} which is ${DELTA} higher"
-              if [[ ${DELTA} -ge ${POOLTOOL_MAX_BLOCK_DELTA} ]]; then
-                # Add some smart bootstrap without trusted peers handling logic
-                exit 1
+              echo -n "PoolTool reporting lastBlockHeight of ${POOLTOOL_MAXHEIGHT} which is ${DELTA} higher. maxDelta is ${POOLTOOL_MAX_BLOCK_DELTA}."
+              if [[ ${DELTA} -gt ${POOLTOOL_MAX_BLOCK_DELTA} ]]; then
+                #TODO: Add some smart bootstrap without trusted peers handling logic
+                if [[ ${jormUptime} -lt ${JORM_MAX_FAULT_UPTIME} ]]; then
+                  echo -n "Jormungandr uptime is less than ${JORM_MAX_FAULT_UPTIME} seconds."
+                  exit 0
+                else
+                  jcli rest v0 shutdown get
+                  exit 1
+                fi
               fi
             fi
           fi

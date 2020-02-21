@@ -22,6 +22,7 @@ POOLTOOL_GENESIS_HASH=${GENESIS_HASH:0:7}
 POOLTOOL_PLATFORM='2nd Layer Docker Health Check'
 lastBlockHeight=$(echo ${JORM_NODE_STATS} | jq -r .lastBlockHeight)
 jormVersion=$(echo ${JORM_NODE_STATS} | jq -r .version)
+jormUptime=$(echo ${JORM_NODE_STATS} | jq -r .uptime)
 lastBlockHash=$(echo ${JORM_NODE_STATS} | jq -r .lastBlockHash)
 lastBlock=$(jcli rest v0 block ${lastBlockHash} get || exit 1)
 lastPoolID=${lastBlock:168:64}
