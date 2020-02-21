@@ -24,6 +24,7 @@ MAINTAINER "Mark Stopka <mark.stopka@perlur.cloud>"
 ENV SERVICE_NAME "cardano-jormungandr"
 
 RUN yum update -y && \
+    yum install -y jq && \
     yum clean all && \
     dnf clean all && \
     rm -rf /var/cache/yum && \
@@ -54,6 +55,6 @@ WORKDIR /srv/cardano/jormungandr/
 
 RUN jcli auto-completion bash ~/etc/ && echo '. ~/etc/jcli.bash' >> .bash_profile
 
-HEALTHCHECK --interval=5s --timeout=1s CMD jcli-node-stats || exit 1
+HEALTHCHECK --interval=1s --timeout=2s CMD jcli-node-stats healthcheck || exit 1
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
