@@ -10,48 +10,37 @@ case "$1" in
     if [[ ${JORM_NODE_STATE} =~ ^(StartingRestServer|PreparingStorage|PreparingBlock0|Bootstrapping|StartingWorkers)$ ]]; then
       START_TIME=$(stat --format %X /proc/1/)
       UPTIME=$((${CURRENT_TIME} - ${START_TIME}))
-      if [[ ${UPTIME} -gt $((${JORM_MAX_STARTUP_MIN} * 60)) ]]; then
+      if [[ ${JORM_MAX_STARTUP_TIME} -eq 0 ]]; then
+        echo -n "Jormungandr startup time healthcheck disabled."
+      elif [[ ${UPTIME} -gt $((${JORM_MAX_STARTUP_TIME} * 60)) ]]; then
         # Terminate if not ready in ${JORM_MAX_STARTUP_MIN} minutes
-        echo -n "Jormungandr was starting for ${JORM_MAX_STARTUP_MIN} minutes!"
+        echo -n "Jormungandr was bootstrapping for ${JORM_MAX_STARTUP_MIN} minutes!"
         exit 1
+      else
+        UPTIME=$(( ${UPTIME} / 60 ))
+        echo -n "Jormungandr is starting for ${UPTIME} minutes."
+        exit 0
       fi
     elif [[ ${JORM_NODE_STATE} == 'Running' ]]; then
-      if [[ ${JORM_NODE_TYPE} == 'pool' ]]; then
-        if ! [[ -z ${POOLTOOL_USER_ID+x} ]] && [[ $((${CURRENT_TIME} % 5)) -eq 0 ]]; then
-          POOLTOOL_GENESIS_HASH=${GENESIS_HASH:0:7}
-          POOLTOOL_PLATFORM='2nd Layer Docker Health Check'
-          lastBlockHeight=$(echo ${JORM_NODE_STATS} | jq -r .lastBlockHeight)
-          jormVersion=$(echo ${JORM_NODE_STATS} | jq -r .version)
-          lastBlockHash=$(echo ${JORM_NODE_STATS} | jq -r .lastBlockHash)
-          lastBlock=$(jcli rest v0 block ${lastBlockHash} get)
-          lastPoolID=${lastBlock:168:64}
-          lastParent=${lastBlock:104:64}
-          lastSlot=$((0x${lastBlock:24:8}))
-          lastEpoch=$((0x${lastBlock:16:8}))
-
-          if [ "${lastBlockHeight}" != "" ]; then
-            POOLTOOL_RESPONSE=$(curl -m 1 -s -G \
-              --data-urlencode "platform=${POOLTOOL_PLATFORM}" \
-              --data-urlencode "jormver=${jormVersion}" \
-              "https://api.pooltool.io/v0/sharemytip?poolid=${JORM_POOL_ID}&userid=${POOLTOOL_USER_ID}&genesispref=${POOLTOOL_GENESIS_HASH}&mytip=${lastBlockHeight}&lasthash=${lastBlockHash}&lastpool=${lastPoolID}&lastparent=${lastParent}&lastslot=${lastSlot}&lastepoch=${lastEpoch}")
-            POOLTOOL_STATUS=$(echo ${POOLTOOL_RESPONSE} | jq -r .success)
-            if [[ ${POOLTOOL_STATUS} == 'true' ]]; then
-              POOLTOOL_ERROR=$(echo ${POOLTOOL_RESPONSE} | jq -r .error)
-              if [[ ${POOLTOOL_ERROR} == 'null' ]]; then
-                POOLTOOL_CONFIDENCE=$(echo ${POOLTOOL_RESPONSE} | jq -r .confidence)
-                if [[ ${POOLTOOL_CONFIDENCE} == 'true' ]]; then
-                  POOLTOOL_SAMPLES=$(echo ${POOLTOOL_RESPONSE} | jq -r .samples)
-                  POOLTOOL_MAXHEIGHT=$(echo ${POOLTOOL_RESPONSE} | jq -r .pooltoolmax)
-                  if [[ ${lastBlockHeight} == ${POOLTOOL_MAXHEIGHT} ]]; then
-                    echo -n "PoolTool reporting same block height: ${lastBlockHeight}"
-                    exit 0
-                  elif [[ ${lastBlockHeight} -lt ${POOLTOOL_MAXHEIGHT} ]]; then
-                    DELTA=$((${POOLTOOL_MAXHEIGHT} - ${lastBlockHeight}))
-                    if [[ ${DELTA} -ge 2 ]]; then
-                      echo -n "PoolTool reporting block height of ${POOLTOOL_MAXHEIGHT} which is ${DELTA} higher"
-                    fi
-                  fi
-                fi
+      if [[ ${JORM_NODE_TYPE} == 'relay' ]]; then
+        echo -n "Jormungandr is in relay mode."
+      elif [[ ${JORM_NODE_TYPE} == 'pool' ]]; then
+        if ! [[ -z ${POOLTOOL_DISABLED+x} ]]; then
+          echo -n "PoolTool is disabled, skipping PoolTool."
+        elif [[ -z ${POOLTOOL_USER_ID+x} ]]; then
+          echo -n 'Variable ${POOLTOOL_USER_ID} is empty, skipping PoolTool.'
+        else
+          if [[ $((${CURRENT_TIME} % 5)) -eq 0 ]]; then
+            source /usr/local/lib/jormungandr-pooltool-reporter.sh
+            if [[ ${lastBlockHeight} == ${POOLTOOL_MAXHEIGHT} ]]; then
+              echo -n "PoolTool reporting same block height: ${lastBlockHeight}"
+              exit 0
+            elif [[ ${lastBlockHeight} -lt ${POOLTOOL_MAXHEIGHT} ]]; then
+              DELTA=$((${POOLTOOL_MAXHEIGHT} - ${lastBlockHeight}))
+              echo -n "PoolTool reporting block height of ${POOLTOOL_MAXHEIGHT} which is ${DELTA} higher"
+              if [[ ${DELTA} -ge ${POOLTOOL_MAX_BLOCK_DELTA} ]]; then
+                # Add some smart bootstrap without trusted peers handling logic
+                exit 1
               fi
             fi
           fi
