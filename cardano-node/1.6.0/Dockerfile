@@ -1,16 +1,14 @@
-FROM perlur/centos-base AS builder
+FROM perlur/centos-haskell-stack AS builder
 
 ENV CARDANO_NODE_VERSION="1.6.0"
 
 RUN yum update -y && \
     yum install -y openssl-devel systemd-devel zlib-devel
-RUN curl --proto '=https' --tlsv1.2 -sSf https://get.haskellstack.org/ | sh -s --
 WORKDIR /usr/src
 RUN git clone --recurse-submodules https://github.com/input-output-hk/cardano-node
 WORKDIR cardano-node
 RUN git fetch --tags
 RUN git checkout ${CARDANO_NODE_VERSION}
-RUN git submodule update --init --recursive
 
 # Ugly workaround for vty-5.25.1
 RUN ln -s /usr/lib64/libtinfo.so.6 /usr/lib64/libtinfo.so
