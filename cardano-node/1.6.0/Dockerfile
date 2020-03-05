@@ -51,6 +51,4 @@ RUN mkdir /srv/cardano/cardano-node/etc/secrets/
 
 WORKDIR /srv/cardano/cardano-node/
 
-HEALTHCHECK --interval=5s --timeout=1s CMD jcli-node-stats || exit 1
-
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
