@@ -14,9 +14,9 @@ RUN git fetch --tags
 RUN git checkout $JORMUNGANDR_VERSION
 RUN git submodule update --init --recursive
 RUN source $HOME/.cargo/env && \
-    cargo install --root /usr/local --path jormungandr
+    cargo install --locked --root /usr/local --path jormungandr
 RUN source $HOME/.cargo/env && \
-    cargo install --root /usr/local --path jcli
+    cargo install --locked --root /usr/local --path jcli
 
 FROM perlur/centos-base
 
