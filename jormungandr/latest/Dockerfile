@@ -5,8 +5,8 @@ ENV JORMUNGANDR_VERSION="master"
 RUN yum update -y && \
     yum install -y git gcc openssl-devel
 RUN source $HOME/.cargo/env && \
-    rustup install stable && \
-    rustup default stable
+    rustup default stable && \
+    rustup self update
 WORKDIR /usr/src
 RUN git clone --recurse-submodules https://github.com/input-output-hk/jormungandr
 WORKDIR jormungandr
