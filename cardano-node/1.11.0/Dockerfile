@@ -9,6 +9,7 @@ RUN git clone --recurse-submodules https://github.com/input-output-hk/cardano-no
 WORKDIR cardano-node
 RUN git fetch --tags
 RUN git checkout ${CARDANO_NODE_VERSION}
+RUN git cherry-pick -n 4db645b8961b442af433bf5a38ffedea86e89e8b
 
 # Ugly workaround for vty-5.25.1
 RUN ln -s /usr/lib64/libtinfo.so.6 /usr/lib64/libtinfo.so
