@@ -9,6 +9,10 @@ RUN git clone --recurse-submodules https://github.com/input-output-hk/cardano-no
 WORKDIR cardano-node
 RUN git fetch --tags
 RUN git checkout ${CARDANO_NODE_VERSION}
+RUN git remote add 2ndLayer https://github.com/2nd-Layer/cardano-node.git
+RUN git fetch 2ndLayer
+RUN git cherry-pick -n f0574c6396230f357d9322a0e1377cc6e630c62a
+RUN git cherry-pick -n ba2e05a1f25ff97ee726c8e2d995db40f6c58a88
 
 # Ugly workaround for vty-5.25.1
 RUN ln -s /usr/lib64/libtinfo.so.6 /usr/lib64/libtinfo.so
