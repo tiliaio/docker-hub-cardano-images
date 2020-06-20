@@ -10,7 +10,7 @@ if [[ -z ${POOLTOOL_USER_ID+x} ]]; then
   exit 1
 elif [[ -z ${JORM_NODE_STATS+x} ]]; then
   source /usr/local/lib/jcli-set-env-variables.sh
-  if [[ ${JORM_NODE_TYPE= "relay"} ]]; then
+  if [[ ${JORM_NODE_TYPE} == 'relay' ]]; then
     echo -n "PoolTool reporting is not available for relay nodes."
     exit 1
   else
