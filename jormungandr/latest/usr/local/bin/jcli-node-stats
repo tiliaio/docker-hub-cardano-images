@@ -44,7 +44,7 @@ case "$1" in
                   echo -n "Jormungandr uptime is less than ${JORM_MAX_FAULT_UPTIME} seconds."
                   exit 0
                 else
-                  jcli rest v0 shutdown get
+                  jcli rest v0 shutdown post
                   exit 1
                 fi
               fi
