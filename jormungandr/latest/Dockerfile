@@ -3,7 +3,7 @@ FROM perlur/centos-rust-rustup AS builder
 ENV JORMUNGANDR_VERSION="master"
 
 RUN yum update -y && \
-    yum install -y git gcc openssl-devel
+    yum install -y git-core gcc openssl-devel
 RUN source $HOME/.cargo/env && \
     rustup default stable && \
     rustup self update
