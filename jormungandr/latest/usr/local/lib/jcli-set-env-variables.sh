@@ -1,7 +1,7 @@
 #!/bin/bash
 
 JORM_USER_HOME=$HOME
-JORM_DB_DIR=${JORM_USER_HOME}storage
+JORM_DB_DIR=${JORM_USER_HOME}storage/
 if [ -f ${JORM_USER_HOME}etc/genesis-hash.txt ]; then
   GENESIS_HASH_FILE=${JORM_USER_HOME}etc/genesis-hash.txt
   GENESIS_HASH=$(cat ${GENESIS_HASH_FILE})

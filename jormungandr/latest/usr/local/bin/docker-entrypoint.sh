@@ -10,10 +10,19 @@ function preExitHook () {
 
 function testStorage () {
   if [[ -d ${JORM_DB_DIR} ]]; then
-    if [[ ! -r ${JORM_DB_DIR}blocks.sqlite ]] ||  [[ ! -w ${JORM_DB_DIR}blocks.sqlite ]]; then
-      echo "ERROR: Database storage file ${JORM_DB_DIR}/blocks.sqlite is not readable or writeable!"
-      preExitHook "$@"
-      exit
+    if [[ -f ${JORM_DB_DIR}blocks.sqlite ]]; then
+      if [[ ! -w ${JORM_DB_DIR}blocks.sqlite ]]; then
+        echo "ERROR: Database storage file ${JORM_DB_DIR}/blocks.sqlite is not readable!"
+        echo "DEBUG: Expected file ownership $(id)"
+        preExitHook "$@"
+        exit
+        if [[ ! -w ${JORM_DB_DIR}blocks.sqlite ]]; then
+          echo "ERROR: Database storage file ${JORM_DB_DIR}/blocks.sqlite is not writeable!"
+          echo "DEBUG: Expected file ownership $(id)"
+          preExitHook "$@"
+          exit
+        fi
+      fi
     fi
     else
       echo "ERROR: Jormungandr database storage directory ${JORM_DB_DIR} does not exist!"
