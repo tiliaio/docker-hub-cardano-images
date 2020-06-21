@@ -8,6 +8,16 @@ function preExitHook () {
   echo 'Exiting...'
 }
 
+function testStorage () {
+  if [[ -d ${JORM_DB_DIR} ]]; then
+    if [[ ! -r ${JORM_DB_DIR}/blocks.sqlite || ! -w ${JORM_DB_DIR}/blocks.sqlite ]]; then
+      echo "ERROR: Database storage file ${JORM_DB_DIR}/blocks.sqlite is not readable or writeable!"
+    else
+      echo "ERROR: Jormungandr database storage directory ${JORM_DB_DIR} does not exist!"
+    fi
+  fi
+}
+
 function setPublicIPvariable () {
   case $1 in
     IPv4)
@@ -81,6 +91,7 @@ if [[ ! -f ${JORM_CONF_FILE} ]]; then
   preExitHook "$@"
   exit
 else
+  testStorage
   if [[ ! -f ${JORM_SECRET_FILE} ]]; then
     echo "Jormungandr node secret file not found! Jormungandr will start in a passive mode!"
     jormungandr \
