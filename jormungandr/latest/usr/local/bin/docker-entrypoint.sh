@@ -11,7 +11,7 @@ function preExitHook () {
 function testStorage () {
   if [[ -d ${JORM_DB_DIR} ]]; then
     if [[ -f ${JORM_DB_DIR}blocks.sqlite ]]; then
-      if [[ ! -w ${JORM_DB_DIR}blocks.sqlite ]]; then
+      if [[ ! -r ${JORM_DB_DIR}blocks.sqlite ]]; then
         echo "ERROR: Database storage file ${JORM_DB_DIR}/blocks.sqlite is not readable!"
         echo "DEBUG: Expected file ownership $(id)"
         preExitHook "$@"
