@@ -38,6 +38,7 @@ MAINTAINER "Mark Stopka <mark.stopka@perlur.cloud>"
 ENV SERVICE_NAME "cardano-node"
 
 RUN yum update -y && \
+    yum install -y libsodium && \
     yum clean all && \
     dnf clean all && \
     rm -rf /var/cache/yum && \
