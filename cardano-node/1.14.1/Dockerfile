@@ -61,6 +61,8 @@ RUN useradd -c "Cardano node user" \
             -s /bin/nologin \
             cardano-node
 
+RUN mkdir -p /var/run/cardano/
+RUN chown cardano-node.cardano-node /var/run/cardano/
 USER cardano-node
 
 RUN mkdir /srv/cardano/cardano-node/{etc,log,storage}/
