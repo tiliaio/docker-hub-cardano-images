@@ -54,7 +54,9 @@ RUN mkdir /srv/cardano/jormungandr/etc/secrets/
 
 WORKDIR /srv/cardano/jormungandr/
 
-RUN jcli auto-completion bash ~/etc/ && echo '. ~/etc/jcli.bash' >> .bash_profile
+COPY srv/cardano/jormungandr/ /srv/cardano/jormungandr/
+
+RUN jcli auto-completion bash ~/etc/
 
 HEALTHCHECK --interval=1s --timeout=2s CMD jcli-node-stats healthcheck || exit 1
 
