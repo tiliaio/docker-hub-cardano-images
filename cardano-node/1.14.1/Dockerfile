@@ -3,7 +3,7 @@ FROM perlur/centos-haskell-ghcup AS builder
 ENV CABAL_VERSION="3.2.0.0"
 ENV GHC_VERSION="8.6.5"
 
-ENV CARDANO_NODE_VERSION="1.14.0"
+ENV CARDANO_NODE_VERSION="1.14.1"
 
 RUN yum update -y && \
     yum install -y libsodium-devel openssl-devel systemd-devel zlib-devel
