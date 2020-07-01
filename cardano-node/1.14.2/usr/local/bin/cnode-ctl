@@ -22,8 +22,9 @@ case "$1" in
       unset IFS
     else
       >&2 echo "ERROR: Failed to retrieve cardano-node tip!"
-      >&2 echo "ERROR: Exiting!"
-      exit 0
+      >&2 echo "ERROR: Terminating!"
+      #TODO: Add graceful shutdown if available
+      exit 1
     fi
     if ! [[ -z ${DEBUG+x} ]]; then
       >&2 echo "DEBUG: currentBlockHash: ${CNODE_STATE['currentBlockHash']}"
