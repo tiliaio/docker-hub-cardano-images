@@ -72,4 +72,6 @@ WORKDIR /srv/cardano/cardano-node/
 
 COPY srv/cardano/cardano-node/ /srv/cardano/cardano-node/
 
+HEALTHCHECK --interval=1s --timeout=2s CMD cnode-ctl healthcheck || exit 1
+
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
