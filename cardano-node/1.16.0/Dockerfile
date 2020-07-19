@@ -16,6 +16,7 @@ RUN git clone --recurse-submodules https://github.com/input-output-hk/cardano-no
 WORKDIR cardano-node
 RUN git fetch --tags
 RUN git checkout ${CARDANO_NODE_VERSION}
+RUN git cherry-pick -n 3ea540531e28ba998b10c73baa01ccdfbcf2804e
 COPY cabal.project.local ./
 
 # Ugly workaround for vty-5.25.1
