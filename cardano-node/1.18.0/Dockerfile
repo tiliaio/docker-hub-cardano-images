@@ -3,7 +3,7 @@ FROM perlur/centos-haskell-ghcup AS builder
 ENV CABAL_VERSION="3.2.0.0"
 ENV GHC_VERSION="8.6.5"
 
-ENV CARDANO_NODE_VERSION="dcoutts/release-1.18.0"
+ENV CARDANO_NODE_VERSION="1.18.0"
 
 RUN yum update -y && \
     yum install -y libsodium-devel openssl-devel systemd-devel zlib-devel
@@ -16,7 +16,8 @@ RUN git clone --recurse-submodules https://github.com/input-output-hk/cardano-no
 WORKDIR /usr/src/cardano-node
 RUN git fetch --tags
 RUN git checkout ${CARDANO_NODE_VERSION}
-RUN git cherry-pick -n f3410221ffbc9c707a367fa5087ac203d12ddaec
+RUN git cherry-pick -n f3410221ffbc9c707a367fa5087ac203d12ddaec # Fixes LiveView memory display 
+RUN git cherry-pick -n 39c02c9ad06bb7b4d59cac2fa4020db8f323e4ac # Show KES values in LiveView
 COPY cabal.project.local ./
 
 # Ugly workaround for vty-5.25.1
